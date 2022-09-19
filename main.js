@@ -108,6 +108,8 @@ async function captureSnip() {
     };
     snipWindow.webContents.send("SET_SOURCE", {
       index,
+      width,
+      height,
     });
     console.log(`Took ${performance.now() - nowSnip}ms to send source`);
   } else {
