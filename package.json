@@ -2,7 +2,7 @@
   "name": "oversnip",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron ."
@@ -11,5 +11,9 @@
   "license": "ISC",
   "devDependencies": {
     "electron": "^20.1.4"
+  },
+  "dependencies": {
+    "got": "^11.8.3",
+    "screenshot-desktop": "^1.12.7"
   }
 }

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="128" height="128" viewBox="0 0 128 128">
+  <defs>
+    <clipPath id="clip-pen">
+      <rect width="128" height="128"/>
+    </clipPath>
+  </defs>
+  <g id="pen" clip-path="url(#clip-pen)">
+    <path id="Path_1" data-name="Path 1" d="M15.5,3.193,1,47.161v60.532H30V47.161L15.5,3.193M15.5,0,31,47v61.693H0V47Z" transform="translate(49 34)"/>
+    <path id="Path_2" data-name="Path 2" d="M4.934,0,9.868,14.961H0Z" transform="translate(59.566 34)"/>
+    <path id="Path_8" data-name="Path 8" d="M.5,47h-1V0h1Z" transform="translate(69.434 86.5)"/>
+    <path id="Path_9" data-name="Path 9" d="M.5,47h-1V0h1Z" transform="translate(59.566 86.5)"/>
+  </g>
+</svg>

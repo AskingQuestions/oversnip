@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="128" height="128" viewBox="0 0 128 128">
+  <defs>
+    <clipPath id="clip-eraser">
+      <rect width="128" height="128"/>
+    </clipPath>
+  </defs>
+  <g id="eraser" clip-path="url(#clip-eraser)">
+    <path id="Rectangle_14" data-name="Rectangle 14" d="M5,1A4,4,0,0,0,1,5V91a4,4,0,0,0,4,4H30a4,4,0,0,0,4-4V5a4,4,0,0,0-4-4H5M5,0H30a5,5,0,0,1,5,5V91a5,5,0,0,1-5,5H5a5,5,0,0,1-5-5V5A5,5,0,0,1,5,0Z" transform="translate(47 40)"/>
+    <path id="Rectangle_15" data-name="Rectangle 15" d="M4,1A3,3,0,0,0,1,4V79a3,3,0,0,0,3,3H31a3,3,0,0,0,3-3V4a3,3,0,0,0-3-3H4M4,0H31a4,4,0,0,1,4,4V79a4,4,0,0,1-4,4H4a4,4,0,0,1-4-4V4A4,4,0,0,1,4,0Z" transform="translate(47 47)"/>
+    <rect id="Rectangle_16" data-name="Rectangle 16" width="35" height="57" transform="translate(47 70)"/>
+  </g>
+</svg>
