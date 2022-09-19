@@ -3,6 +3,8 @@ const { ipcRenderer } = require("electron");
 ipcRenderer.on("SET_SOURCE", async (event, encoded) => {
   let img = document.querySelector("img");
   img.src = "snip://" + encoded.index + ".png";
+  img.width = window.innerWidth + "px";
+  img.height = window.innerHeight + "px";
 
   let cropper = document.querySelector(".cropper");
 

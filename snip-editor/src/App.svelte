@@ -106,8 +106,8 @@
 
     currentOp = operations[operations.length - 1];
     let point = {
-      x: event.clientX - margin,
-      y: event.clientY,
+      x: event.clientX * encoded.factor - margin,
+      y: event.clientY * encoded.factor,
     };
 
     if (
@@ -199,6 +199,8 @@
     let didBlur = false;
     drawingCanvas.width = imgEl.width;
     drawingCanvas.height = imgEl.height;
+    imgEl.style.width = imgEl.width * (1 / encoded.factor) + "px";
+    imgEl.style.height = imgEl.height * (1 / encoded.factor) + "px";
     let ctx = drawingCanvas.getContext("2d");
     let ctxBlur = blurringCanvas.getContext("2d");
     let ctxImg = imgEl.getContext("2d");
@@ -444,9 +446,9 @@
     };
     bounds.left = -encoded.bounds.x * encoded.factor;
     bounds.top = -encoded.bounds.y * encoded.factor;
-    cropEl.style.width = encoded.bounds.width * encoded.factor + "px";
-    cropEl.style.height = encoded.bounds.height * encoded.factor + "px";
-    cropEl.style.left = encoded.editorMargin * encoded.factor + "px";
+    cropEl.style.width = encoded.bounds.width + "px";
+    cropEl.style.height = encoded.bounds.height + "px";
+    cropEl.style.left = encoded.editorMargin + "px";
     imgEl.width = encoded.bounds.width * encoded.factor;
     imgEl.height = encoded.bounds.height * encoded.factor;
   }

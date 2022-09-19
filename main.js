@@ -53,7 +53,7 @@ function createSnipWindow(opts) {
     resizable: false,
     webPreferences: {
       preload: path.join(__dirname, "preloadSnip.js"),
-      zoomFactor: 1.0 / factor,
+      // zoomFactor: 1.0,
     },
   });
 
@@ -212,11 +212,12 @@ app.whenReady().then(() => {
 
     const { screen } = require("electron");
     let factor = screen.getPrimaryDisplay().scaleFactor;
+    // factor = 1;
     let setBounds = {
-      x: Math.floor(data.x / factor),
-      y: Math.floor(data.y / factor),
-      width: Math.floor(data.width / factor),
-      height: Math.floor(data.height / factor),
+      x: Math.floor(data.x / 1),
+      y: Math.floor(data.y / 1),
+      width: Math.floor(data.width / 1),
+      height: Math.floor(data.height / 1),
     };
     const snipWindow = new BrowserWindow({
       x: setBounds.x - editorMargin,
@@ -233,7 +234,7 @@ app.whenReady().then(() => {
       alwaysOnTop: true,
       webPreferences: {
         preload: path.join(__dirname, "preloadEditor.js"),
-        zoomFactor: 1.0 / factor,
+        // zoomFactor: 1.0,
       },
     });
 
