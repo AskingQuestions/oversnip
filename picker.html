@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html style="cursor: none">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: snip:; media-src 'self';"
+    />
+    <link href="./styles.css" rel="stylesheet" />
+    <title>Oversnip</title>
+  </head>
+  <body style="cursor: none">
+    <img style="image-rendering: pixelated; image-rendering: crisp-edges" />
+    <div class="color"></div>
+    <div class="tooltip">
+      <div>
+        <span>copy</span><span style="margin: 0px 10px"></span>
+        <span style="margin-left: -10px">add</span>
+      </div>
+      <svg xmlns="http://www.w3.org/2000/svg" height="40" width="40">
+        <path
+          fill="white"
+          d="M20 35q-4.208 0-7.104-2.896T10 25V14.875q0-4.208 2.896-7.104T20 4.875q4.208 0 7.104 2.896T30 14.875V25q0 4.208-2.896 7.104T20 35Zm.708-20.125h7.875q0-3.417-2.291-5.875Q24 6.542 20.708 6.292Zm-9.291 0h7.875V6.292Q16 6.542 13.708 9q-2.291 2.458-2.291 5.875ZM20 33.583q3.542 0 6.062-2.5 2.521-2.5 2.521-6.083v-8.708H11.417V25q0 3.583 2.5 6.083t6.083 2.5Zm0-17.291Zm.708-1.417Zm-1.416 0ZM20 16.292Z"
+        />
+      </svg>
+    </div>
+    <canvas class="glass"></canvas>
+
+    <script src="./renderer.js"></script>
+  </body>
+</html>

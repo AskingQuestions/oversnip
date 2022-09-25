@@ -1,0 +1,11 @@
+@import "./fonts.css";
+
+html,
+body {
+  font-family: Nunito;
+}
+
+::selection {
+  color: rgb(44, 44, 44);
+  background: rgba(0, 153, 255, 0.493);
+}

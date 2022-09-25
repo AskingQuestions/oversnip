@@ -1,0 +1,119 @@
+@import "./global.css";
+
+body,
+html {
+  margin: 0;
+  height: 100%;
+  background-color: var(--col);
+}
+
+:root {
+  --col: rgb(55, 55, 55);
+  --primary: dodgerblue;
+}
+
+.settings {
+  padding: 24px;
+}
+
+.setting {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+  border-radius: 8px;
+  color: white;
+  margin-bottom: 4px;
+}
+
+.setting:nth-child(odd) {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.setting:nth-child(even) {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.setting.setting--section {
+  background-color: transparent;
+  opacity: 0.5;
+  margin-top: 24px;
+  display: flex;
+  justify-content: flex-start;
+  user-select: none;
+}
+
+.setting__icon svg {
+  max-width: 32px;
+  max-height: 32px;
+  fill: white;
+  stroke-width: 5px;
+  stroke: white;
+  margin-right: 6px;
+}
+
+input[type="text"] {
+  all: unset;
+  background-color: var(--col);
+  color: white;
+  border-radius: 4px;
+}
+
+/* ===== Scrollbar CSS ===== */
+/* Firefox */
+* {
+  scrollbar-width: auto;
+  scrollbar-color: #303030 var(--col);
+}
+
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 17px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--col);
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #161616;
+  border-radius: 15px;
+  border: 6px solid var(--col);
+}
+
+input[type="color"] {
+  cursor: pointer;
+  width: 68px;
+  height: 24px;
+  border-radius: 8px;
+  background-color: var(--col);
+  border: none;
+  padding: 0px !important;
+  overflow: hidden;
+  margin-bottom: -6px;
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+  margin: 0;
+  border: none;
+}
+
+input[type="color"]::-webkit-color-swatch {
+  margin: 0;
+  border: none;
+}
+
+select {
+  cursor: pointer;
+  height: 24px;
+  border-radius: 8px;
+  background-color: var(--col);
+  border: none;
+  padding: 0px 8px;
+  outline: none;
+  color: white;
+  font-family: Nunito;
+  font-size: 16px;
+}

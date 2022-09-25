@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html style="cursor: default">
   <head>
     <meta charset="UTF-8" />
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
@@ -10,10 +10,19 @@
     <link href="./styles.css" rel="stylesheet" />
     <title>Oversnip</title>
   </head>
-  <body>
-    <img />
-    <div class="cropper"></div>
-    <div class="overlay"></div>
+  <body style="cursor: default">
+    <div class="card"></div>
+    <div class="drag-bar"></div>
+    <svg
+      class="close-card"
+      xmlns="http://www.w3.org/2000/svg"
+      height="40"
+      width="40"
+    >
+      <path
+        d="m10.583 30.417-1-1L19 20l-9.417-9.417 1-1L20 19l9.417-9.417 1 1L21 20l9.417 9.417-1 1L20 21Z"
+      />
+    </svg>
 
     <script src="./renderer.js"></script>
   </body>
