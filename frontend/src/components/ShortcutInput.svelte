@@ -1,3 +1,6 @@
+<!--
+  Keyboard shortcut input component with support for Ctrl/Cmd, Shift, Alt, and Meta keys
+-->
 <script>
   import { createEventDispatcher } from "svelte";
 

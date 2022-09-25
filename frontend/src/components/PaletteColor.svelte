@@ -1,3 +1,6 @@
+<!--
+  Color card component with copy/paste on click
+-->
 <script>
   import colorContrast from "color-contrast";
   export let hex = "";

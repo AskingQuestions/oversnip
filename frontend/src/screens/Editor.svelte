@@ -1,5 +1,10 @@
+<!--
+  Monolithic post snip editor with drawing, searching, copying and more.
+-->
 <script>
   import { onMount, onDestroy } from "svelte";
+
+  // Icons
   import CloseIcon from "@/assets/close.svg?raw";
   import FileIcon from "@/assets/file.svg?raw";
   import SettingsIcon from "@/assets/settings.svg?raw";
@@ -14,40 +19,54 @@
   import RedactIcon from "@/assets/redact.svg?raw";
   import ArrowIcon from "@/assets/arrow.svg?raw";
   import RectIcon from "@/assets/rect.svg?raw";
+
+  // Custom components
   import Dropdown from "../components/Dropdown.svelte";
-  import Vibrant from "node-vibrant";
   import PaletteColor from "../components/PaletteColor.svelte";
   import Slider from "../components/Slider.svelte";
 
+  // Palette generator
+  import Vibrant from "node-vibrant";
+
+  // Simple reactive settings store
   import { minimalPrintShortcut, settings } from "../stores/settings.js";
 
+  // OCR
   import { createWorker } from "tesseract.js";
-  import { text } from "svelte/internal";
 
+  // Offscreen canvases for the drawing pipeline
   let drawingCanvas = document.createElement("canvas");
   let blurringCanvas = document.createElement("canvas");
   let blurringPreCanvas = document.createElement("canvas");
 
+  // Is the temporary file currently being dragged away from the window?
   let draggingFile = false;
 
   // Used to show a loading screen while anything is loading
   let globalLoading = false;
 
-  // Stack of drawing operations
+  // Stack of drawing operations for undo/redo
   let operations = [];
   let redo = [];
 
   // Raw words from tesseract.js
-  let scannedWords = [];
+  let scannedWords = []; // (WIP image overlay)
   let scannedText = "";
 
-  // This is inverted: 0 = Opaque, 1 = Transparent
-  let opacity = 0;
+  // Global window opacity, this is bound to the slider so users can use the snip as a stencil or overlay
+  let opacity = 0; // This is inverted: 0 = Opaque, 1 = Transparent
 
+  // Should the list of dominant colors be shown to the left of the editor?
   let showPalette = false;
 
+  // List of 5-6 hex colors for the palette
+  let palette = [];
+
+  // Is the user hovering over the window?
+  // Used to determine if we should show the toolbars
   let hovering = false;
 
+  // Drawing tool configs
   let penSize = parseInt($settings["tool.pen.size"]);
   let penColor = $settings["tool.pen.color"];
   let highlighterSize = parseInt($settings["tool.highlighter.size"]);
@@ -59,30 +78,52 @@
   let rectColor = $settings["tool.box.color"];
   let redactSize = parseInt($settings["tool.redact.size"]);
 
-  let palette = [];
-
+  // Object containing snip meta data sent from the main process. This includes the base64 encoded png
   let encoded = {};
+
+  // Pixel margin arround the transparent window frame. This should be just enough for our shadow and any toolbars needed.
+  // This is dynamically set from the main process using the SET_SOURCE ipc
   let margin = 0;
   let marginBottom = 0;
+
+  // Sub bounds of the full screenshot. This is used to crop the image to the snip bounds.
   let bounds = {};
 
+  // Visible canvas
   let imgEl;
+
+  // Small file preview canvas at the bottom right
   let fileCanvasEl;
+
+  // imgEl wrapper
   let cropEl;
+
   let resizeEl;
+
+  // Raw screenshot image loaded from the filesystem using our custom protocol snip://<index>
   let baseImg;
+
+  // Adds a class to play the darken animation for copying
   let playCopied = false;
 
+  // Sub bounds navigation
   let zoom = 1;
   let panX = 0;
   let panY = 0;
 
+  // Key of the currently selected tool
+  // "pen", "highlighter", "eraser", "arrow", "box", "redact"
   let selectedTool = "";
 
+  // Can we move the window around?
+  // If a tool is selected we can't
   $: draggable = selectedTool == "";
 
+  // Is the mouse currently down?
   let isDown = false;
+
   let isResizing = false;
+  // Start data for the resize operation
   let resizeDown = { x: 0, y: 0, width: 0, height: 0 };
   let boundsDown = { x: 0, y: 0, width: 0, height: 0 };
   let resizePosition = {
@@ -93,7 +134,6 @@
   };
 
   function printShortcut(key) {
-    console.log($settings, key);
     return minimalPrintShortcut($settings["shortcut." + key]);
   }
 
@@ -104,6 +144,8 @@
   let touchDown = { x: 0, y: 0 };
   let panDown = { x: 0, y: 0 };
   let windowDown = [0, 0];
+  // Mouse button state on mousedown
+  let buttonDown = 0;
 
   function updateZoom() {
     imgEl.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
@@ -126,6 +168,12 @@
     updateZoom();
   }
 
+  /**
+   * Triggers the save file dialog
+   *
+   * @param {string} fileName
+   * @param {string} urlFile
+   */
   function saveFile(fileName, urlFile) {
     let a = document.createElement("a");
     a.style = "display: none";
@@ -137,6 +185,10 @@
     a.remove();
   }
 
+  /**
+   * Handles keyboard shortcuts
+   * @param {KeyboardEvent} e
+   */
   function handleKey(e) {
     if (e.code == "KeyS" && (e.ctrlKey || e.metaKey)) {
       e.preventDefault();
@@ -199,6 +251,11 @@
     }
   }
 
+  /**
+   * Begins a pen down operation
+   *
+   * This will add a new operation to our stack and save the current state of the tools and panning for drawing later
+   */
   function startOperation() {
     let currentOp = {
       tool: selectedTool,
@@ -223,6 +280,7 @@
     redo = [];
   }
 
+  // Relays to mouseMove, for touch devices
   function touchMove(e) {
     mouseMove({
       clientX: e.touches[0].clientX,
@@ -232,11 +290,7 @@
 
   let currentMove = { x: 0, y: 0 };
 
-  setInterval(() => {
-    if (isDown && !selectedTool) {
-    }
-  }, 1000 / 144);
-
+  // When the snip is recropped we need to recaulate some things. Main will give us new info about the crop
   window.snip.onRecropped((newEncoded) => {
     encoded = newEncoded;
     margin = encoded.editorMargin * encoded.factor;
@@ -245,6 +299,11 @@
     paintCanvas();
   });
 
+  /**
+   * Handles panning, drawing, window moving, and resizing depending on what is currently active/available
+   *
+   * @param {MouseEvent} event
+   */
   async function mouseMove(event) {
     draggingFile = false;
 
@@ -277,7 +336,7 @@
 
     if (!isDown) return;
 
-    if (!selectedTool) {
+    if (!selectedTool || buttonDown == 2 || buttonDown == 1) {
       if (zoom == 1) {
         currentMove = { x: windowDown[0] + dx, y: windowDown[1] + dy };
         window.snip.moveWindow(currentMove.x, currentMove.y);
@@ -323,7 +382,14 @@
     paintCanvas();
   }
 
+  /**
+   * Handles the mouse down event on the drawing canvas
+   *
+   * @param e
+   */
   async function toolDown(e) {
+    buttonDown = e.button;
+
     touchDown = {
       x: e.screenX,
       y: e.screenY,
@@ -346,6 +412,9 @@
     }
   }
 
+  /**
+   * Handles the mouse up event on the drawing canvas
+   */
   function toolUp() {
     if (operations.length > 0) {
       operations[operations.length - 1].open = false;
@@ -384,6 +453,9 @@
     selectedTool = tool;
   }
 
+  /**
+   * Uploads a clamped-size image to imgur and sends the user to Google image search
+   */
   async function handleSearch() {
     globalLoading = true;
 
@@ -410,8 +482,13 @@
     globalLoading = false;
   }
 
+  // Used to keep track of imgur deleteHashes
   let imgurUploadIndex = -1;
 
+  /**
+   * Uploads a full-size snip to imgur and stores the deleteHash in case
+   * the user needs to take the image down while the snip is still open
+   */
   async function handleUpload() {
     globalLoading = true;
     let url = imgEl.toDataURL("image/png");
@@ -422,6 +499,9 @@
     globalLoading = false;
   }
 
+  /**
+   * Deletes the latest imgur upload
+   */
   async function handleDeleteUpload() {
     globalLoading = true;
 
@@ -436,10 +516,9 @@
     window.close();
   }
 
-  function gradient(a, b) {
-    return (b.y - a.y) / (b.x - a.x);
-  }
-
+  /**
+   * Renders the full snip canvas (imgEl) with all operations and cropping applied
+   */
   function paintCanvas() {
     blurringCanvas.width = imgEl.width + 200;
     blurringCanvas.height = imgEl.height + 200;
@@ -685,6 +764,9 @@
     imgEl.height = encoded.bounds.height * encoded.factor;
   }
 
+  /**
+   * Loads the baseImg, paints the canvas, and generates the palette
+   */
   function renderImage() {
     baseImg = new Image();
     baseImg.src = "snip://" + encoded.index + ".png";
@@ -711,6 +793,11 @@
     draggingFile = false;
   }
 
+  /**
+   * Begins a native file drag operation allowing the user to move a temporary snip file around
+   * This calls the main process
+   * @param event
+   */
   function handleDragstart(event) {
     event.preventDefault();
     console.log("Drag", event);
@@ -741,8 +828,11 @@
     };
   }
 
+  /**
+   * Handles zooming
+   * @param e
+   */
   function handleMousewheel(e) {
-    console.log("Mousewheel", e);
     e.preventDefault();
     if (e.ctrlKey) {
       let delta = e.deltaY;
@@ -758,6 +848,9 @@
     }
   }
 
+  /**
+   * Handles the mouse down event on the canvas corners
+   */
   async function handleResizeDown(e) {
     touchDown = {
       x: e.screenX,
@@ -772,10 +865,8 @@
       signX: x - 1,
       signY: y - 1,
     };
-    console.log("Resize down", resizePosition);
+
     resizeDown = await window.snip.getWindowBounds();
-    // resizeDown.x = resizeDown.x - encoded.bounds.x + encoded.editorMargin;
-    // resizeDown.y = resizeDown.y - encoded.bounds.y + 20;
 
     boundsDown.x = encoded.bounds.x;
     boundsDown.y = encoded.bounds.y;
@@ -786,6 +877,9 @@
     isResizing = true;
   }
 
+  /**
+   * Triggers OCR and displays the results
+   */
   async function handleScan() {
     globalLoading = true;
     if (scannedWords.length > 0) {
@@ -840,7 +934,7 @@
   onMount(() => {
     encoded = snip.getEncoded();
     hovering = !encoded.autoImageSearch;
-    console.log(encoded);
+
     margin = encoded.editorMargin * encoded.factor;
     marginBottom = encoded.editorMarginBottom * encoded.factor;
     renderImage();
@@ -852,7 +946,7 @@
           navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
         });
       }
-      console.log(encoded);
+
       if (encoded.autoImageSearch) {
         await handleSearch();
         close();
@@ -868,6 +962,7 @@
     document.addEventListener("dragover", handleDragover);
     window.addEventListener("wheel", handleMousewheel);
   });
+
   onDestroy(() => {
     document.removeEventListener("mouseup", toolUp);
     document.removeEventListener("mousemove", mouseMove);

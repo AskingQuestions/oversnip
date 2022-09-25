@@ -1,24 +1,70 @@
 {
   "name": "oversnip",
   "version": "1.0.0",
-  "description": "",
+  "description": "A minimal screenshot tool for Windows, Mac, and Linux",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron ."
+    "start": "npm run build && npm run electron:start",
+    "dev": "concurrently -k \"cd frontend && npx vite\" \"npm run electron:dev\"",
+    "build": "cd frontend && npx vite build",
+    "preview": "cd frontend && npx vite preview",
+    "electron:dev": "cross-env IS_DEV=true electron-forge start",
+    "electron:start": "electron-forge start",
+    "electron:build": "electron-forge make",
+    "electron:package": "electron-forge package"
   },
   "files": [
     "preloads/preloadSnip.js",
     "preloads/preloadGlobal.js"
   ],
-  "author": "",
+  "author": "Jeremy Frank <jrmy.dev>",
   "license": "ISC",
   "devDependencies": {
+    "@electron-forge/cli": "^6.0.0-beta.66",
+    "@electron-forge/maker-deb": "^6.0.0-beta.66",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.66",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.66",
+    "@electron-forge/maker-zip": "^6.0.0-beta.66",
+    "concurrently": "^7.4.0",
+    "cross-env": "^7.0.3",
     "electron": "^20.1.4"
   },
   "dependencies": {
+    "electron-squirrel-startup": "^1.0.0",
     "got": "^11.8.3",
-    "jimp": "^0.16.2",
-    "screenshot-desktop": "^1.12.7"
+    "jimp": "^0.16.2"
+  },
+  "config": {
+    "forge": {
+      "packagerConfig": {
+        "icon": "images/icon.ico",
+        "ignore": [
+          "frontend"
+        ]
+      },
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "oversnip",
+            "setupIcon": "images/icon.ico"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {}
+        }
+      ]
+    }
   }
 }

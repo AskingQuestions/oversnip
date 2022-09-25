@@ -9,7 +9,9 @@ const projectRootDir = resolve(__dirname);
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: process.env.IS_DEV !== "true" ? "./" : "/",
   build: {
+    outDir: "../build",
     rollupOptions: {
       input: {
         editor: fileURLToPath(new URL("./editor.html", import.meta.url)),

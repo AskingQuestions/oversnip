@@ -14,6 +14,7 @@ const {
   nativeImage,
   shell,
   webFrame,
+  Menu,
 } = require("electron");
 
 const path = require("path");
@@ -23,6 +24,8 @@ const got = require("got");
 const Jimp = require("jimp");
 
 const editorMargin = 100;
+
+const isDev = process.env.IS_DEV === "true";
 
 let snippingWindows = [];
 let editorWindows = [];
@@ -46,13 +49,12 @@ function createWindow() {
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    icon: "./images/icon.ico",
     show: false,
     webPreferences: {
       preload: path.join(__dirname, "preloads/preloadGlobal.js"),
     },
   });
-
-  appIcon = new Tray("./images/icon.png");
 
   // and load the index.html of the app.
   mainWindow.loadFile("index.html");
@@ -71,6 +73,8 @@ function createSnipWindow(opts) {
     height: opts.height / 1,
     transparent: true,
     frame: false,
+
+    icon: "./images/icon.ico",
 
     fullscreen: true,
     resizable: false,
@@ -106,6 +110,8 @@ function createColorPicker(opts) {
     height: Math.floor(opts.height),
     transparent: true,
     frame: false,
+
+    icon: "./images/icon.ico",
 
     fullscreen: true,
     resizable: false,
@@ -220,6 +226,8 @@ function createColorCard(opts) {
     ...setBounds,
     transparent: true,
     frame: false,
+
+    icon: "./images/icon.ico",
 
     fullscreen: true,
     resizable: false,
@@ -562,22 +570,59 @@ function registerGlobalShortcuts() {
   }
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
-  registerGlobalShortcuts();
+function registerTray() {
+  tray = new Tray("./images/iconTemplate.png");
 
-  protocol.registerFileProtocol("snip", (request, callback) => {
-    callback({
-      path: path.join(
-        app.getPath("temp"),
-        "snip" + request.url.replace("snip://", "")
-      ),
-    });
-  });
-  createWindow();
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      icon: "./images/icon.png",
+      label: "Oversnip",
+      type: "normal",
+      enabled: false,
+    },
+    { type: "separator" },
+    {
+      label: "Capture Snip",
+      type: "normal",
+      click() {
+        captureSnip();
+      },
+    },
+    {
+      label: "Pick Color",
+      type: "normal",
+      click() {
+        openColorPicker();
+      },
+    },
+    {
+      label: "Image Search",
+      type: "normal",
+      click() {
+        captureSnip(true);
+      },
+    },
+    { type: "separator" },
+    {
+      label: "Settings",
+      type: "normal",
+      click() {
+        openSettings();
+      },
+    },
+    {
+      label: "Quit",
+      type: "normal",
+      click() {
+        app.quit();
+      },
+    },
+  ]);
+  tray.setToolTip("Oversnip");
+  tray.setContextMenu(contextMenu);
+}
 
+function registerIPCHandlers() {
   ipcMain.handle("search", async (event, data) => {
     // Upload to imgur
 
@@ -853,6 +898,8 @@ app.whenReady().then(() => {
       alwaysOnTop: true,
       resizable: false,
 
+      icon: "./images/icon.ico",
+
       webPreferences: {
         preload: path.join(__dirname, "preloads/preloadGlobal.js"),
         // zoomFactor: 1.0,
@@ -886,7 +933,7 @@ app.whenReady().then(() => {
     delete images[event.sender.id];
 
     // and load the index.html of the app.
-    snipWindow.loadURL("http://localhost:5173/editor.html");
+    openFrontend(snipWindow, "editor.html");
 
     snipWindow.setBounds(windowBounds);
   });
@@ -906,6 +953,36 @@ app.whenReady().then(() => {
   ipcMain.handle("openSettings", async (event, data) => {
     openSettings();
   });
+}
+
+function openFrontend(win, file) {
+  if (isDev) {
+    win.loadURL("http://localhost:5173/" + file);
+  } else {
+    win.loadFile(path.join(__dirname, "build", file));
+  }
+}
+
+// This method will be called when Electron has finished
+// initialization and is ready to create browser windows.
+// Some APIs can only be used after this event occurs.
+app.whenReady().then(() => {
+  registerGlobalShortcuts();
+
+  registerTray();
+
+  protocol.registerFileProtocol("snip", (request, callback) => {
+    callback({
+      path: path.join(
+        app.getPath("temp"),
+        "snip" + request.url.replace("snip://", "")
+      ),
+    });
+  });
+
+  createWindow();
+
+  registerIPCHandlers();
 
   app.on("activate", function () {
     // On macOS it's common to re-create a window in the app when the
@@ -932,6 +1009,10 @@ app.on("window-all-closed", function () {
   if (process.platform !== "darwin") app.quit();
 });
 
+app.setLoginItemSettings({
+  openAtLogin: true,
+});
+
 function openSettings() {
   const { BrowserWindow } = require("electron");
   const settingsWindow = new BrowserWindow({
@@ -940,12 +1021,13 @@ function openSettings() {
     minWidth: 444,
     minHeight: 300,
     autoHideMenuBar: true,
+    icon: "./images/icon.ico",
     webPreferences: {
       preload: path.join(__dirname, "preloads/preloadGlobal.js"),
     },
   });
 
-  settingsWindow.loadURL("http://localhost:5173/settings.html");
+  openFrontend(settingsWindow, "settings.html");
   addSettingWatcher(settingsWindow);
 }
 

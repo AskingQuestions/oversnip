@@ -1,3 +1,6 @@
+<!--
+  Floating dropdown currenlty only used for the size bubbles
+-->
 <script>
   import { onDestroy, onMount } from "svelte";
 

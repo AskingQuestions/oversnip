@@ -1,3 +1,6 @@
+<!--
+  Simple range slider component with vertical and horizontal modes
+-->
 <script>
   import { onMount, onDestroy } from "svelte";
 
