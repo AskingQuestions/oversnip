@@ -16,7 +16,9 @@ jobs:
           cd frontend
           npm install
       - name: build-frontend
-        run: npm run build
+        run: |
+          cd frontend
+          npm run build
       - name: build-app
         run: npm run electron:build
 
@@ -34,7 +36,9 @@ jobs:
           cd frontend
           npm install
       - name: build-frontend
-        run: npm run build
+        run: |
+          cd frontend
+          npm run build
       - name: build-app
         run: npm run electron:build
 
@@ -52,6 +56,13 @@ jobs:
           cd frontend
           npm install
       - name: build-frontend
-        run: npm run build
+        run: |
+          cd frontend
+          npm run build
       - name: build-app
         run: npm run electron:build
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: final
+          path: ./
