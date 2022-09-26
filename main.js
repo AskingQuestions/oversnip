@@ -92,10 +92,24 @@ function handleSquirrelEvent() {
 
 const path = require("path");
 const fs = require("fs");
+const os = require("os");
 const got = require("got");
 
-const ICON_PATH = path.join(__dirname, "images", "icon.ico");
-const TRAY_ICON_PATH = path.join(__dirname, "images", "iconTemplate.png");
+let ICON_PATH = "";
+let TRAY_ICON_PATH = path.join(__dirname, "images", "iconTemplate.png");
+
+switch (os.platform()) {
+  case "darwin":
+    ICON_PATH = path.join(__dirname, "images", "icon.icns");
+    break;
+  case "win32":
+    ICON_PATH = path.join(__dirname, "images", "icon.ico");
+    TRAY_ICON_PATH = path.join(__dirname, "images", "iconTemplate.ico");
+    break;
+  default:
+    ICON_PATH = path.join(__dirname, "images", "icon.png");
+    break;
+}
 
 const Jimp = require("jimp");
 

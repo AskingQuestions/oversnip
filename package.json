@@ -37,7 +37,7 @@
   "config": {
     "forge": {
       "packagerConfig": {
-        "icon": "images/icon.ico",
+        "icon": "images/icon",
         "ignore": [
           "frontend",
           "images/examples"

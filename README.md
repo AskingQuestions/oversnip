@@ -81,7 +81,12 @@ Oversnip is open source and powered by Electron. Hop in and make it your own!
 
 ```
 git clone https://github.com/AskingQuestions/oversnip.git
+
 cd oversnip
 npm install
+cd oversnip/frontend
+npm install
+
+cd ../
 npm run dev
 ```
