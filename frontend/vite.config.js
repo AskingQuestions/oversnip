@@ -16,6 +16,7 @@ export default defineConfig({
       input: {
         editor: fileURLToPath(new URL("./editor.html", import.meta.url)),
         settings: fileURLToPath(new URL("./settings.html", import.meta.url)),
+        install: fileURLToPath(new URL("./install.html", import.meta.url)),
       },
     },
   },

@@ -1,6 +1,6 @@
 {
   "name": "oversnip",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A minimal screenshot tool for Windows, Mac, and Linux",
   "main": "main.js",
   "scripts": {
@@ -39,7 +39,8 @@
       "packagerConfig": {
         "icon": "images/icon.ico",
         "ignore": [
-          "frontend"
+          "frontend",
+          "images/examples"
         ]
       },
       "makers": [
@@ -47,7 +48,9 @@
           "name": "@electron-forge/maker-squirrel",
           "config": {
             "name": "oversnip",
-            "setupIcon": "images/icon.ico"
+            "setupIcon": "images/icon.ico",
+            "iconUrl": "https://github.com/AskingQuestions/oversnip/raw/main/images/icon.ico",
+            "loadingGif": "images/installer.gif"
           }
         },
         {

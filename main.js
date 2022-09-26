@@ -17,9 +17,85 @@ const {
   Menu,
 } = require("electron");
 
+let doOpenInstallWindow = false;
+
+// this should be placed at top of main.js to handle setup events quickly
+if (handleSquirrelEvent()) {
+  // squirrel event handled and app will exit in 1000ms, so don't do anything else
+  return;
+}
+
+function handleSquirrelEvent() {
+  if (process.argv.length === 1) {
+    return false;
+  }
+
+  const ChildProcess = require("child_process");
+  const path = require("path");
+
+  const appFolder = path.resolve(process.execPath, "..");
+  const rootAtomFolder = path.resolve(appFolder, "..");
+  const updateDotExe = path.resolve(path.join(rootAtomFolder, "Update.exe"));
+  const selfExe = path.resolve(path.join(rootAtomFolder, "oversnip.exe"));
+  const exeName = path.basename(process.execPath);
+
+  const spawn = function (command, args) {
+    let spawnedProcess, error;
+
+    try {
+      spawnedProcess = ChildProcess.spawn(command, args, { detached: true });
+    } catch (error) {}
+
+    return spawnedProcess;
+  };
+
+  const spawnUpdate = function (args) {
+    return spawn(updateDotExe, args);
+  };
+
+  const squirrelEvent = process.argv[1];
+  switch (squirrelEvent) {
+    case "--squirrel-install":
+    case "--squirrel-updated":
+      // Optionally do things such as:
+      // - Add your .exe to the PATH
+      // - Write to the registry for things like file associations and
+      //   explorer context menus
+
+      // Install desktop and start menu shortcuts
+      spawnUpdate(["--createShortcut", exeName]);
+
+      setTimeout(app.quit, 1000);
+      return true;
+
+    case "--squirrel-uninstall":
+      // Undo anything you did in the --squirrel-install and
+      // --squirrel-updated handlers
+
+      // Remove desktop and start menu shortcuts
+      spawnUpdate(["--removeShortcut", exeName]);
+
+      setTimeout(app.quit, 1000);
+      return true;
+
+    case "--squirrel-obsolete":
+      // This is called on the outgoing version of your app before
+      // we update to the new version - it's the opposite of
+      // --squirrel-updated
+
+      app.quit();
+      return true;
+    case "--squirrel-firstrun":
+      doOpenInstallWindow = true;
+  }
+}
+
 const path = require("path");
 const fs = require("fs");
 const got = require("got");
+
+const ICON_PATH = path.join(__dirname, "images", "icon.ico");
+const TRAY_ICON_PATH = path.join(__dirname, "images", "iconTemplate.png");
 
 const Jimp = require("jimp");
 
@@ -49,7 +125,7 @@ function createWindow() {
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
-    icon: "./images/icon.ico",
+    icon: ICON_PATH,
     show: false,
     webPreferences: {
       preload: path.join(__dirname, "preloads/preloadGlobal.js"),
@@ -74,7 +150,7 @@ function createSnipWindow(opts) {
     transparent: true,
     frame: false,
 
-    icon: "./images/icon.ico",
+    icon: ICON_PATH,
 
     fullscreen: true,
     resizable: false,
@@ -111,7 +187,7 @@ function createColorPicker(opts) {
     transparent: true,
     frame: false,
 
-    icon: "./images/icon.ico",
+    icon: ICON_PATH,
 
     fullscreen: true,
     resizable: false,
@@ -227,7 +303,7 @@ function createColorCard(opts) {
     transparent: true,
     frame: false,
 
-    icon: "./images/icon.ico",
+    icon: ICON_PATH,
 
     fullscreen: true,
     resizable: false,
@@ -265,6 +341,10 @@ async function captureSnip(autoImageSearch = false) {
     screen.getCursorScreenPoint()
   );
 
+  let sourceIndex = screen
+    .getAllDisplays()
+    .findIndex((d) => d.id === currentScreen.id);
+
   let factor = currentScreen.scaleFactor;
   const primaryDisplay = currentScreen;
   const { width, height } = primaryDisplay.size;
@@ -285,6 +365,10 @@ async function captureSnip(autoImageSearch = false) {
       let source = sources.find(
         (s) => parseInt(s.display_id) === primaryDisplay.id
       );
+
+      if (!source) {
+        source = source[sourceIndex];
+      }
 
       if (source) {
         console.log("Found display", source.display_id);
@@ -364,6 +448,10 @@ async function openColorPicker() {
     screen.getCursorScreenPoint()
   );
 
+  let sourceIndex = screen
+    .getAllDisplays()
+    .findIndex((d) => d.id === currentScreen.id);
+
   let factor = currentScreen.scaleFactor;
   const primaryDisplay = currentScreen;
   const { width, height } = primaryDisplay.size;
@@ -384,6 +472,10 @@ async function openColorPicker() {
       let source = sources.find(
         (s) => parseInt(s.display_id) === primaryDisplay.id
       );
+
+      if (!source) {
+        source = source[sourceIndex];
+      }
 
       if (source) {
         console.log("Found display", source.display_id);
@@ -571,11 +663,11 @@ function registerGlobalShortcuts() {
 }
 
 function registerTray() {
-  tray = new Tray("./images/iconTemplate.png");
+  tray = new Tray(TRAY_ICON_PATH);
 
   const contextMenu = Menu.buildFromTemplate([
     {
-      icon: "./images/icon.png",
+      icon: path.resolve(__dirname, "images", "icon.png"),
       label: "Oversnip",
       type: "normal",
       enabled: false,
@@ -898,7 +990,7 @@ function registerIPCHandlers() {
       alwaysOnTop: true,
       resizable: false,
 
-      icon: "./images/icon.ico",
+      icon: ICON_PATH,
 
       webPreferences: {
         preload: path.join(__dirname, "preloads/preloadGlobal.js"),
@@ -967,6 +1059,9 @@ function openFrontend(win, file) {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
+  if (doOpenInstallWindow) {
+    openInstallWindow();
+  }
   registerGlobalShortcuts();
 
   registerTray();
@@ -1021,7 +1116,7 @@ function openSettings() {
     minWidth: 444,
     minHeight: 300,
     autoHideMenuBar: true,
-    icon: "./images/icon.ico",
+    icon: ICON_PATH,
     webPreferences: {
       preload: path.join(__dirname, "preloads/preloadGlobal.js"),
     },
@@ -1029,6 +1124,24 @@ function openSettings() {
 
   openFrontend(settingsWindow, "settings.html");
   addSettingWatcher(settingsWindow);
+}
+
+function openInstallWindow() {
+  const { BrowserWindow } = require("electron");
+  const installWindow = new BrowserWindow({
+    width: 444,
+    height: 600,
+    minWidth: 444,
+    minHeight: 300,
+    autoHideMenuBar: true,
+    icon: ICON_PATH,
+    webPreferences: {
+      preload: path.join(__dirname, "preloads/preloadGlobal.js"),
+    },
+  });
+
+  openFrontend(installWindow, "install.html");
+  addSettingWatcher(installWindow);
 }
 
 function sendSettingsToWindow(window) {
