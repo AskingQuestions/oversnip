@@ -395,59 +395,59 @@ async function captureSnip(autoImageSearch = false) {
         //   scaleFactor: 1.0,
         // });
 
-        let url2 = source.thumbnail.toBitmap();
-        var image = new Jimp(width * factor, height * factor, async function (
-          err,
-          image
-        ) {
-          let buffer = image.bitmap.data;
-          let snipPath = path.join(app.getPath("temp"), `snip${index}.png`);
-          for (var x = 0; x < width * factor; x++) {
-            for (var y = 0; y < height * factor; y++) {
-              const offset = (y * width * factor + x) * 4; // RGBA = 4 bytes
-              buffer[offset] = url2[offset + 2]; // R
-              buffer[offset + 1] = url2[offset + 1]; // G
-              buffer[offset + 2] = url2[offset + 0]; // B
-              buffer[offset + 3] = url2[offset + 3]; // Alpha
-            }
-          }
-          await image.write(snipPath);
+        // let url2 = source.thumbnail.toBitmap();
+        // var image = new Jimp(width * factor, height * factor, async function (
+        //   err,
+        //   image
+        // ) {
+        //   let buffer = image.bitmap.data;
+        //   let snipPath = path.join(app.getPath("temp"), `snip${index}.png`);
+        //   for (var x = 0; x < width * factor; x++) {
+        //     for (var y = 0; y < height * factor; y++) {
+        //       const offset = (y * width * factor + x) * 4; // RGBA = 4 bytes
+        //       buffer[offset] = url2[offset + 2]; // R
+        //       buffer[offset + 1] = url2[offset + 1]; // G
+        //       buffer[offset + 2] = url2[offset + 0]; // B
+        //       buffer[offset + 3] = url2[offset + 3]; // Alpha
+        //     }
+        //   }
+        //   await image.write(snipPath);
 
-          console.log(`Took ${performance.now() - now}ms to get PNG`);
+        let snipPath = path.join(app.getPath("temp"), `snip${index}.png`);
+        let url2 = source.thumbnail.toPNG();
+        fs.writeFileSync(snipPath, url2);
 
-          let url =
-            "data:image/png;base64," +
-            fs.readFileSync(snipPath).toString("base64");
+        console.log(`Took ${performance.now() - now}ms to get PNG`);
 
-          let snipWindow = createSnipWindow({
-            width,
-            height,
-            area: primaryDisplay.workArea,
-          });
+        let url = "data:image/png;base64," + url2.toString("base64");
 
-          snippingWindows.push(snipWindow);
-
-          let nowSnip = performance.now();
-          images[snipWindow.webContents.id] = {
-            index,
-            url,
-            width,
-            height,
-            display: primaryDisplay,
-            autoImageSearch,
-          };
-          snipWindow.webContents.send("SET_SOURCE", {
-            index,
-            width,
-            height,
-          });
-
-          console.log(`Took ${performance.now() - nowSnip}ms to send source`);
-
-          console.log(
-            `Took ${performance.now() - veryStart}ms to capture shot`
-          );
+        let snipWindow = createSnipWindow({
+          width,
+          height,
+          area: primaryDisplay.workArea,
         });
+
+        snippingWindows.push(snipWindow);
+
+        let nowSnip = performance.now();
+        images[snipWindow.webContents.id] = {
+          index,
+          url,
+          width,
+          height,
+          display: primaryDisplay,
+          autoImageSearch,
+        };
+        snipWindow.webContents.send("SET_SOURCE", {
+          index,
+          width,
+          height,
+        });
+
+        console.log(`Took ${performance.now() - nowSnip}ms to send source`);
+
+        console.log(`Took ${performance.now() - veryStart}ms to capture shot`);
+        // });
 
         return;
       }
@@ -488,7 +488,7 @@ async function openColorPicker() {
       );
 
       if (!source) {
-        source = source[sourceIndex];
+        source = sources[sourceIndex];
       }
 
       if (source) {
@@ -499,63 +499,62 @@ async function openColorPicker() {
 
         now = performance.now();
 
-        let url2 = source.thumbnail.toBitmap();
-        var image = new Jimp(width * factor, height * factor, async function (
-          err,
-          image
-        ) {
-          let buffer = image.bitmap.data;
-          let snipPath = path.join(app.getPath("temp"), `snip${index}.png`);
-          for (var x = 0; x < width * factor; x++) {
-            for (var y = 0; y < height * factor; y++) {
-              const offset = (y * width * factor + x) * 4; // RGBA = 4 bytes
-              buffer[offset] = url2[offset + 2]; // R
-              buffer[offset + 1] = url2[offset + 1]; // G
-              buffer[offset + 2] = url2[offset + 0]; // B
-              buffer[offset + 3] = url2[offset + 3]; // Alpha
-            }
-          }
-          await image.write(snipPath);
+        // let url2 = source.thumbnail.toBitmap();
+        // var image = new Jimp(width * factor, height * factor, async function (
+        //   err,
+        //   image
+        // ) {
+        //   let buffer = image.bitmap.data;
+        //   let snipPath = path.join(app.getPath("temp"), `snip${index}.png`);
+        //   for (var x = 0; x < width * factor; x++) {
+        //     for (var y = 0; y < height * factor; y++) {
+        //       const offset = (y * width * factor + x) * 4; // RGBA = 4 bytes
+        //       buffer[offset] = url2[offset + 2]; // R
+        //       buffer[offset + 1] = url2[offset + 1]; // G
+        //       buffer[offset + 2] = url2[offset + 0]; // B
+        //       buffer[offset + 3] = url2[offset + 3]; // Alpha
+        //     }
+        //   }
+        //   await image.write(snipPath);
+        let snipPath = path.join(app.getPath("temp"), `snip${index}.png`);
+        let url2 = source.thumbnail.toPNG();
+        fs.writeFileSync(snipPath, url2);
 
-          console.log(`Took ${performance.now() - now}ms to get PNG`);
+        console.log(`Took ${performance.now() - now}ms to get PNG`);
 
-          let url =
-            "data:image/png;base64," +
-            fs.readFileSync(snipPath).toString("base64");
+        let url = "data:image/png;base64," + url2.toString("base64");
 
-          let snipWindow = createColorPicker({
-            display: primaryDisplay,
-            width,
-            height,
-            area: primaryDisplay.workArea,
-          });
-
-          snippingWindows.push(snipWindow);
-
-          let nowSnip = performance.now();
-          images[snipWindow.webContents.id] = {
-            index,
-            url,
-            width,
-            height,
-            display: primaryDisplay,
-          };
-          console.log(width, factor);
-          snipWindow.webContents.send("SET_SOURCE", {
-            index,
-            width: width * factor,
-            height: height * factor,
-            factor,
-          });
-          currentColorPicker = snipWindow;
-          currentColorPickerDisplay = primaryDisplay;
-
-          console.log(`Took ${performance.now() - nowSnip}ms to send source`);
-
-          console.log(
-            `Took ${performance.now() - veryStart}ms to capture shot`
-          );
+        let snipWindow = createColorPicker({
+          display: primaryDisplay,
+          width,
+          height,
+          area: primaryDisplay.workArea,
         });
+
+        snippingWindows.push(snipWindow);
+
+        let nowSnip = performance.now();
+        images[snipWindow.webContents.id] = {
+          index,
+          url,
+          width,
+          height,
+          display: primaryDisplay,
+        };
+        console.log(width, factor);
+        snipWindow.webContents.send("SET_SOURCE", {
+          index,
+          width: width * factor,
+          height: height * factor,
+          factor,
+        });
+        currentColorPicker = snipWindow;
+        currentColorPickerDisplay = primaryDisplay;
+
+        console.log(`Took ${performance.now() - nowSnip}ms to send source`);
+
+        console.log(`Took ${performance.now() - veryStart}ms to capture shot`);
+        // });
 
         return;
       }
