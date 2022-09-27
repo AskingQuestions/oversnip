@@ -381,7 +381,7 @@ async function captureSnip(autoImageSearch = false) {
       );
 
       if (!source) {
-        source = source[sourceIndex];
+        source = sources[sourceIndex];
       }
 
       if (source) {
