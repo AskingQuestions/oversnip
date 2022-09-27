@@ -73,9 +73,22 @@ Your snips float above other windows and can be used as stencils or glanceable i
 
 Oversnip is open source and powered by Electron. Hop in and make it your own!
 
----
+<br><br>
 
-## Installation & Usage
+## Download
+
+<p align="center">
+<a href="https://github.com/AskingQuestions/oversnip/releases/download/v1.0.6/oversnip-1.0.5.Setup.exe"><img style="width: 100px" src="images/windows.svg"></a>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+<a href="https://github.com/AskingQuestions/oversnip/releases/download/v1.0.6/oversnip-darwin-x64-1.0.5.zip
+"><img style="width: 100px" src="images/apple.svg"></a>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+<a href="https://github.com/AskingQuestions/oversnip/releases/download/v1.0.6/oversnip-1.0.5_amd64.deb
+"><img style="width: 100px" src="images/linux.svg"></a>
+
+</p>
+
+<br><br>
 
 ## Development
 

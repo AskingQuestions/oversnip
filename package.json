@@ -1,6 +1,6 @@
 {
   "name": "oversnip",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "A minimal screenshot tool for Windows, Mac, and Linux",
   "main": "main.js",
   "scripts": {
@@ -56,18 +56,24 @@
           }
         },
         {
-          "name": "@electron-forge/maker-zip",
-          "platforms": [
-            "darwin"
-          ]
+          "name": "@electron-forge/maker-dmg",
+          "config": {
+            "format": "ULFO"
+          }
         },
         {
           "name": "@electron-forge/maker-deb",
-          "config": {}
+          "config": {
+            "maintainer": "Jeremy Frank <jrmy.dev>",
+            "homepage": "oversnip.com"
+          }
         },
         {
           "name": "@electron-forge/maker-rpm",
-          "config": {}
+          "config": {
+            "maintainer": "Jeremy Frank <jrmy.dev>",
+            "homepage": "oversnip.com"
+          }
         }
       ],
       "publishers": [
