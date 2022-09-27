@@ -1,6 +1,6 @@
 {
   "name": "oversnip",
-  "version": "1.0.1",
+  "version": "1.0.4",
   "description": "A minimal screenshot tool for Windows, Mac, and Linux",
   "main": "main.js",
   "scripts": {
