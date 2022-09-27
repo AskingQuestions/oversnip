@@ -78,12 +78,12 @@ Oversnip is open source and powered by Electron. Hop in and make it your own!
 ## Download
 
 <p align="center">
-<a href="https://github.com/AskingQuestions/oversnip/releases/download/v1.0.8/oversnip-1.0.8.Setup.exe"><img style="width: 100px" src="images/windows.svg"></a>
+<a href="https://github.com/AskingQuestions/oversnip/releases/download/v1.0.9/oversnip-1.0.9.Setup.exe"><img style="width: 100px" src="images/windows.svg"></a>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-<a href="https://github.com/AskingQuestions/oversnip/releases/download/v1.0.8/oversnip-1.0.8-x64.dmg
+<a href="https://github.com/AskingQuestions/oversnip/releases/download/v1.0.9/oversnip-1.0.9-x64.dmg
 "><img style="width: 100px" src="images/apple.svg"></a>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
-<a href="https://github.com/AskingQuestions/oversnip/releases/download/v1.0.8/oversnip-1.0.8_amd64.deb
+<a href="https://github.com/AskingQuestions/oversnip/releases/download/v1.0.9/oversnip-1.0.9_amd64.deb
 "><img style="width: 100px" src="images/linux.svg"></a>
 
 </p>
