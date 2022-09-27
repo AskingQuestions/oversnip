@@ -65,4 +65,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: final
-          path: ./
+          path: |
+            build

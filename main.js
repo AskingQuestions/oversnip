@@ -681,7 +681,7 @@ function registerTray() {
 
   const contextMenu = Menu.buildFromTemplate([
     {
-      icon: path.resolve(__dirname, "images", "icon.png"),
+      icon: path.resolve(__dirname, "images", "menu-icon.png"),
       label: "Oversnip",
       type: "normal",
       enabled: false,
